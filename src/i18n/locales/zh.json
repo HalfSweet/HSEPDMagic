@@ -1,0 +1,53 @@
+{
+  "app": {
+    "title": "HS EPD Magic - 墨水屏LUT生成器",
+    "welcomeTitle": "欢迎使用 HS EPD Magic"
+  },
+  "nav": {
+    "home": "首页",
+    "projects": "项目",
+    "tools": "工具",
+    "about": "关于",
+    "language": "语言",
+    "theme": "主题"
+  },
+  "project": {
+    "create": "创建项目",
+    "list": "项目列表",
+    "name": "项目名称",
+    "driver": "驱动IC",
+    "chip": "芯片型号",
+    "lutType": "LUT类型",
+    "createButton": "创建项目",
+    "import": "导入",
+    "export": "导出",
+    "open": "打开",
+    "edit": "修改",
+    "delete": "删除",
+    "download": "下载",
+    "share": "分享",
+    "createdTime": "创建时间",
+    "updatedTime": "更新时间",
+    "actions": "操作"
+  },
+  "driver": {
+    "eink": "墨水屏显示",
+    "ssd1677": "SSD1677"
+  },
+  "lutType": {
+    "full": "全刷新",
+    "partial": "局部刷新",
+    "fast": "快速刷新",
+    "custom": "自定义"
+  },
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "loading": "加载中...",
+    "success": "成功",
+    "error": "错误",
+    "warning": "警告",
+    "info": "信息"
+  }
+}
