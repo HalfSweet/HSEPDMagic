@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
@@ -13,6 +14,7 @@ import DefaultLayout from '@/layouts/default';
 
 export default function ProjectManager() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     projects,
     loading,
@@ -32,23 +34,36 @@ export default function ProjectManager() {
   const driverConfigs = getAllDriverConfigs();
 
   const handleCreateProject = () => {
+    console.log('开始创建项目:', formData);
+    
     if (!formData.name.trim()) {
+      console.warn('项目名称为空');
       // TODO: Add toast notification
       return;
     }
 
-    createProject({
+    const newProject = createProject({
       name: formData.name,
       driverType: 'eink', // 默认值
       chipModel: formData.chipModel,
       lutType: 'full', // 默认值
     });
 
+    console.log('项目创建成功:', newProject);
+
     // Reset form
     setFormData({
       name: '',
       chipModel: 'ssd1677',
     });
+
+    // Navigate to project details page
+    if (newProject && newProject.id) {
+      console.log('跳转到项目详情页, ID:', newProject.id);
+      navigate(`/project-details?id=${newProject.id}`);
+    } else {
+      console.error('项目创建失败或没有返回ID:', newProject);
+    }
   };
 
   const handleImport = () => {
@@ -73,27 +88,34 @@ export default function ProjectManager() {
   };
 
   const handleAction = (action: string, projectId: string) => {
+    console.log('执行操作:', action, '项目ID:', projectId);
+    
     switch (action) {
       case 'open':
-        // TODO: Navigate to project editor
-        console.log('Open project:', projectId);
+        // Navigate to project details page
+        console.log('导航到项目详情页:', `/project-details?id=${projectId}`);
+        navigate(`/project-details?id=${projectId}`);
         break;
       case 'edit':
         // TODO: Edit project metadata
-        console.log('Edit project:', projectId);
+        console.log('编辑项目:', projectId);
         break;
       case 'delete':
         if (confirm(t('common.confirm'))) {
+          console.log('删除项目:', projectId);
           deleteProject(projectId);
         }
         break;
       case 'download':
+        console.log('导出项目:', projectId);
         exportProject(projectId);
         break;
       case 'share':
         // TODO: Implement sharing
-        console.log('Share project:', projectId);
+        console.log('分享项目:', projectId);
         break;
+      default:
+        console.warn('未知操作:', action);
     }
   };
 
