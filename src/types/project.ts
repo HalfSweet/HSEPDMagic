@@ -11,7 +11,17 @@ export interface ProjectConfig {
   // SSD1677 specific configuration
   lutData?: LUTData;
   temperature?: TemperatureConfig;
+  voltageSettings?: VoltageSettings;
   // Add more configuration fields as needed
+}
+
+export interface VoltageSettings {
+  vgh: number;  // Gate High Voltage
+  vgl: number;  // Gate Low Voltage
+  vsh: number;  // Source High Voltage
+  vshr: number; // Source High Voltage Reference
+  vsl: number;  // Source Low Voltage
+  vcom: number; // VCOM Voltage
 }
 
 export interface LUTData {

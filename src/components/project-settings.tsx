@@ -1,31 +1,38 @@
 import { useState } from 'react';
 import { Input } from '@heroui/input';
+import { Select, SelectItem } from '@heroui/select';
 import { Button } from '@heroui/button';
-import { Project } from '@/types';
+import { Project, VoltageSettings } from '@/types';
+import { getAllDriverConfigs } from '@/config/drivers';
 
 interface ProjectSettingsProps {
   project: Project;
+  onProjectUpdate?: (updatedProject: Partial<Project>) => void;
 }
 
-interface VoltageSettings {
-  vgh: number;  // Gate High Voltage
-  vgl: number;  // Gate Low Voltage
-  vsh: number;  // Source High Voltage
-  vshr: number; // Source High Voltage Reference
-  vsl: number;  // Source Low Voltage
-  vcom: number; // VCOM Voltage
-}
+export default function ProjectSettings({ project, onProjectUpdate }: ProjectSettingsProps) {
+  // Get available driver configurations
+  const driverConfigs = getAllDriverConfigs();
 
-export default function ProjectSettings({ project }: ProjectSettingsProps) {
+  // Project basic info state
+  const [projectInfo, setProjectInfo] = useState({
+    name: project.name,
+    chipModel: project.chipModel
+  });
+
   // Default voltage settings based on SSD1677 specifications
-  const [voltageSettings, setVoltageSettings] = useState<VoltageSettings>({
+  const defaultVoltageSettings: VoltageSettings = {
     vgh: 20.0,   // Gate High Voltage (10V ~ 25V)
     vgl: -20.0,  // Gate Low Voltage (-25V ~ -15V)
     vsh: 15.0,   // Source High Voltage (10V ~ 20V)
     vshr: 4.0,   // Source High Voltage Reference (0V ~ 10V)
     vsl: -15.0,  // Source Low Voltage (-20V ~ -10V)
     vcom: -1.5,  // VCOM Voltage (-3V ~ 0V)
-  });
+  };
+
+  const [voltageSettings, setVoltageSettings] = useState<VoltageSettings>(
+    project.config?.voltageSettings || defaultVoltageSettings
+  );
 
   const handleVoltageChange = (field: keyof VoltageSettings, value: string) => {
     const numValue = parseFloat(value);
@@ -37,21 +44,43 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
     }
   };
 
+  const handleProjectInfoChange = (field: 'name' | 'chipModel', value: string) => {
+    setProjectInfo(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleSave = () => {
-    // TODO: Save voltage settings to project config
-    console.log('Saving voltage settings:', voltageSettings);
+    // Save both project info and voltage settings
+    const updatedProject = {
+      name: projectInfo.name,
+      chipModel: projectInfo.chipModel as 'ssd1677',
+      updatedTime: new Date().toISOString(),
+      config: {
+        ...project.config,
+        voltageSettings: voltageSettings
+      }
+    };
+    
+    if (onProjectUpdate) {
+      onProjectUpdate(updatedProject);
+    }
+    
+    console.log('保存项目设置:', {
+      projectInfo,
+      voltageSettings
+    });
   };
 
   const handleReset = () => {
-    // Reset to default values
-    setVoltageSettings({
-      vgh: 20.0,
-      vgl: -20.0,
-      vsh: 15.0,
-      vshr: 4.0,
-      vsl: -15.0,
-      vcom: -1.5,
+    // Reset to original project values and default voltage settings
+    setProjectInfo({
+      name: project.name,
+      chipModel: project.chipModel
     });
+    
+    setVoltageSettings(project.config?.voltageSettings || defaultVoltageSettings);
   };
 
   return (
@@ -62,24 +91,34 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
             label="项目名称"
-            value={project.name}
-            isReadOnly
+            value={projectInfo.name}
+            onChange={(e) => handleProjectInfoChange('name', e.target.value)}
             variant="flat"
             classNames={{
               base: "transition-all duration-200",
-              inputWrapper: "bg-default-50 hover:bg-default-100",
+              inputWrapper: "bg-default-50 hover:bg-default-100 data-[focus=true]:bg-default-50",
             }}
           />
-          <Input
+          <Select
             label="芯片型号"
-            value={project.chipModel.toUpperCase()}
-            isReadOnly
+            placeholder="选择芯片型号"
+            selectedKeys={[projectInfo.chipModel]}
+            onSelectionChange={(keys: any) => {
+              const key = Array.from(keys)[0] as string;
+              handleProjectInfoChange('chipModel', key);
+            }}
             variant="flat"
             classNames={{
               base: "transition-all duration-200",
-              inputWrapper: "bg-default-50 hover:bg-default-100",
+              trigger: "bg-default-50 hover:bg-default-100 data-[focus=true]:bg-default-50",
             }}
-          />
+          >
+            {driverConfigs.map((config) => (
+              <SelectItem key={config.id}>
+                {config.name}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
       </div>
 
@@ -104,7 +143,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />
@@ -119,7 +158,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />
@@ -143,7 +182,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />
@@ -158,7 +197,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />
@@ -173,7 +212,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />
@@ -197,7 +236,7 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
               variant="flat"
               classNames={{
                 base: "transition-all duration-200",
-                inputWrapper: "hover:shadow-sm",
+                inputWrapper: "hover:shadow-sm bg-default-50 data-[focus=true]:bg-default-50",
                 description: "text-xs",
               }}
             />

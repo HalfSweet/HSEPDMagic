@@ -18,7 +18,7 @@ export default function ProjectDetailsPage() {
   console.log('项目详情页面渲染, URL参数:', Object.fromEntries(searchParams.entries()));
   console.log('提取的项目ID:', projectId);
   
-  const { getProject, loading } = useProjectManager();
+  const { getProject, updateProject, loading } = useProjectManager();
   const [project, setProject] = useState<Project | null>(null);
   const [activeTab, setActiveTab] = useState<string>('waveform');
   const [generatedCode, setGeneratedCode] = useState<string>('');
@@ -56,6 +56,14 @@ export default function ProjectDetailsPage() {
   const handleCodeGenerate = (code: string) => {
     setGeneratedCode(code);
     setShowCodePreview(true);
+  };
+
+  const handleProjectUpdate = (updates: Partial<Project>) => {
+    if (project && project.id) {
+      updateProject(project.id, updates);
+      // Update local project state
+      setProject(prev => prev ? { ...prev, ...updates } : null);
+    }
   };
 
   const handleCodePreviewClose = () => {
@@ -179,7 +187,10 @@ export default function ProjectDetailsPage() {
                     配置 SSD1677 墨水屏驱动芯片的工作电压和相关参数
                   </p>
                 </div>
-                <ProjectSettings project={project} />
+                <ProjectSettings 
+                  project={project} 
+                  onProjectUpdate={handleProjectUpdate}
+                />
               </div>
             </Tab>
           </Tabs>
