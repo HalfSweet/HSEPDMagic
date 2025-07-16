@@ -1,9 +1,7 @@
 export interface Project {
   id: string;
   name: string;
-  driverType: 'eink';
   chipModel: 'ssd1677';
-  lutType: 'full' | 'partial' | 'fast' | 'custom';
   createdTime: string;
   updatedTime: string;
   config?: ProjectConfig;

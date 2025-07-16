@@ -44,9 +44,7 @@ export default function ProjectManager() {
 
     const newProject = createProject({
       name: formData.name,
-      driverType: 'eink', // 默认值
       chipModel: formData.chipModel,
-      lutType: 'full', // 默认值
     });
 
     console.log('项目创建成功:', newProject);

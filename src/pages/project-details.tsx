@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Tabs, Tab } from '@heroui/tabs';
 import { Chip } from '@heroui/chip';
@@ -21,7 +20,7 @@ export default function ProjectDetailsPage() {
   
   const { getProject, loading } = useProjectManager();
   const [project, setProject] = useState<Project | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('settings');
+  const [activeTab, setActiveTab] = useState<string>('waveform');
   const [generatedCode, setGeneratedCode] = useState<string>('');
   const [showCodePreview, setShowCodePreview] = useState<boolean>(false);
 
@@ -78,191 +77,112 @@ export default function ProjectDetailsPage() {
 
   return (
     <DefaultLayout>
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto px-6 space-y-6">
         {/* 项目头部信息 */}
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center w-full">
-              <div className="flex items-center gap-4">
-                <div>
-                  <h1 className="text-2xl font-bold">{project.name}</h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Chip size="sm" variant="flat" color="primary">
-                      {project.chipModel.toUpperCase()}
-                    </Chip>
-                    <Chip size="sm" variant="flat" color="secondary">
-                      {project.lutType}
-                    </Chip>
-                    <span className="text-small text-default-500">
-                      创建于 {new Date(project.createdTime).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="bordered"
-                  size="sm"
-                  onClick={() => navigate('/project-manager')}
-                >
-                  返回项目列表
-                </Button>
-                <Button
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-600 rounded-full"></div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                {project.name}
+              </h1>
+              <div className="flex items-center gap-3 mt-1">
+                <Chip 
+                  size="sm" 
+                  variant="flat" 
                   color="primary"
-                  size="sm"
-                  onClick={() => setShowCodePreview(true)}
-                  isDisabled={!generatedCode}
+                  className="text-xs"
                 >
-                  查看代码
-                </Button>
+                  {project.chipModel.toUpperCase()}
+                </Chip>
               </div>
             </div>
-          </CardHeader>
-        </Card>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="light"
+              size="sm"
+              onClick={() => navigate('/project-manager')}
+              className="transition-all duration-200"
+            >
+              返回项目列表
+            </Button>
+            <Button
+              color="primary"
+              size="sm"
+              onClick={() => setShowCodePreview(true)}
+              isDisabled={!generatedCode}
+              className="transition-all duration-200"
+            >
+              查看代码
+            </Button>
+          </div>
+        </div>
 
         {/* 主要内容区域 */}
-        <Card>
-          <CardBody className="p-0">
-            <Tabs
-              selectedKey={activeTab}
-              onSelectionChange={(key) => setActiveTab(key as string)}
-              variant="underlined"
-              className="w-full"
-              classNames={{
-                tabList: "px-6 pt-6",
-                panel: "p-6 pt-4"
-              }}
+        <div className="min-h-screen">
+          <Tabs
+            selectedKey={activeTab}
+            onSelectionChange={(key) => setActiveTab(key as string)}
+            variant="light"
+            className="w-full"
+            classNames={{
+              tabList: "gap-6 w-full relative rounded-xl bg-default-100 p-1",
+              panel: "w-full mt-6",
+              tab: "max-w-fit px-6 py-3 h-12 rounded-lg transition-all duration-200",
+              tabContent: "group-data-[selected=true]:text-white",
+              cursor: "w-full bg-primary shadow-lg rounded-lg"
+            }}
+          >
+            {/* 波形编辑 Tab - 放在左边 */}
+            <Tab
+              key="waveform"
+              title={
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-current opacity-60"></div>
+                  <span className="font-medium">波形编辑</span>
+                </div>
+              }
             >
-              {/* 工程设置 Tab */}
-              <Tab
-                key="settings"
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>⚙️</span>
-                    <span>工程设置</span>
-                  </div>
-                }
-              >
-                <div className="space-y-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2">SSD1677 驱动参数配置</h3>
-                    <p className="text-sm text-default-500">
-                      配置墨水屏驱动芯片的工作电压和相关参数
-                    </p>
-                  </div>
-                  <ProjectSettings project={project} />
+              <div className="space-y-8 bg-content1 rounded-xl p-8 shadow-small">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2 text-foreground">
+                    LUT 波形配置
+                  </h2>
+                  <p className="text-default-500 mb-8">
+                    可视化编辑 SSD1677 的查找表（LUT）波形数据，支持10组不同的刷新模式
+                  </p>
                 </div>
-              </Tab>
-
-              {/* 波形编辑 Tab */}
-              <Tab
-                key="waveform"
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>📊</span>
-                    <span>波形编辑</span>
-                  </div>
-                }
-              >
-                <div className="space-y-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2">LUT 波形配置</h3>
-                    <p className="text-sm text-default-500">
-                      可视化编辑SSD1677的查找表（LUT）波形数据，支持10组不同的刷新模式
-                    </p>
-                  </div>
-                  <WaveformEditor 
-                    project={project} 
-                    onCodeGenerate={handleCodeGenerate}
-                  />
-                </div>
-              </Tab>
-
-              {/* 温度配置 Tab */}
-              <Tab
-                key="temperature"
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>🌡️</span>
-                    <span>温度补偿</span>
-                  </div>
-                }
-              >
-                <div className="space-y-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2">温度补偿配置</h3>
-                    <p className="text-sm text-default-500">
-                      配置不同温度范围下的LUT参数调整
-                    </p>
-                  </div>
-                  <Card>
-                    <CardBody>
-                      <div className="text-center py-8">
-                        <p className="text-default-500">温度补偿功能正在开发中...</p>
-                        <p className="text-sm text-default-400 mt-2">
-                          将支持根据环境温度自动调整刷新参数
-                        </p>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </div>
-              </Tab>
-
-              {/* 高级设置 Tab */}
-              <Tab
-                key="advanced"
-                title={
-                  <div className="flex items-center gap-2">
-                    <span>🔧</span>
-                    <span>高级设置</span>
-                  </div>
-                }
-              >
-                <div className="space-y-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold mb-2">高级配置选项</h3>
-                    <p className="text-sm text-default-500">
-                      专业用户的高级设置和调试选项
-                    </p>
-                  </div>
-                  <Card>
-                    <CardBody>
-                      <div className="text-center py-8">
-                        <p className="text-default-500">高级设置功能正在开发中...</p>
-                        <p className="text-sm text-default-400 mt-2">
-                          将包括时序调试、波形分析等功能
-                        </p>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </div>
-              </Tab>
-            </Tabs>
-          </CardBody>
-        </Card>
-
-        {/* 项目信息摘要 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardBody className="text-center">
-              <div className="text-2xl font-bold text-primary">SSD1677</div>
-              <div className="text-sm text-default-500">驱动芯片</div>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody className="text-center">
-              <div className="text-2xl font-bold text-secondary">{project.lutType.toUpperCase()}</div>
-              <div className="text-sm text-default-500">LUT类型</div>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody className="text-center">
-              <div className="text-2xl font-bold text-success">
-                {new Date(project.updatedTime).toLocaleDateString()}
+                <WaveformEditor 
+                  project={project} 
+                  onCodeGenerate={handleCodeGenerate}
+                />
               </div>
-              <div className="text-sm text-default-500">最后修改</div>
-            </CardBody>
-          </Card>
+            </Tab>
+
+            {/* 工程设置 Tab - 放在右边 */}
+            <Tab
+              key="settings"
+              title={
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-current opacity-60"></div>
+                  <span className="font-medium">工程设置</span>
+                </div>
+              }
+            >
+              <div className="space-y-8 bg-content1 rounded-xl p-8 shadow-small">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-2 text-foreground">
+                    驱动参数配置
+                  </h2>
+                  <p className="text-default-500 mb-8">
+                    配置 SSD1677 墨水屏驱动芯片的工作电压和相关参数
+                  </p>
+                </div>
+                <ProjectSettings project={project} />
+              </div>
+            </Tab>
+          </Tabs>
         </div>
       </div>
 

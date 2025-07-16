@@ -1,9 +1,6 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader } from '@heroui/card';
 import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
-import { Divider } from '@heroui/divider';
 import { Project } from '@/types';
 
 interface ProjectSettingsProps {
@@ -20,8 +17,6 @@ interface VoltageSettings {
 }
 
 export default function ProjectSettings({ project }: ProjectSettingsProps) {
-  const { t } = useTranslation();
-  
   // Default voltage settings based on SSD1677 specifications
   const [voltageSettings, setVoltageSettings] = useState<VoltageSettings>({
     vgh: 20.0,   // Gate High Voltage (10V ~ 25V)
@@ -60,124 +55,173 @@ export default function ProjectSettings({ project }: ProjectSettingsProps) {
   };
 
   return (
-    <div className="max-w-4xl">
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col gap-1">
-            <h2 className="text-xl font-semibold">工程设置</h2>
-            <p className="text-small text-default-500">
-              配置 {project.chipModel.toUpperCase()} 驱动电压参数
-            </p>
-          </div>
-        </CardHeader>
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Project Information */}
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold text-foreground">项目信息</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Input
+            label="项目名称"
+            value={project.name}
+            isReadOnly
+            variant="flat"
+            classNames={{
+              base: "transition-all duration-200",
+              inputWrapper: "bg-default-50 hover:bg-default-100",
+            }}
+          />
+          <Input
+            label="芯片型号"
+            value={project.chipModel.toUpperCase()}
+            isReadOnly
+            variant="flat"
+            classNames={{
+              base: "transition-all duration-200",
+              inputWrapper: "bg-default-50 hover:bg-default-100",
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Voltage Settings */}
+      <div className="space-y-8">
+        <h3 className="text-lg font-semibold text-foreground">驱动电压设置</h3>
         
-        <CardBody className="gap-6">
-          {/* Project Information */}
-          <div>
-            <h3 className="text-lg font-medium mb-4">项目信息</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="项目名称"
-                value={project.name}
-                isReadOnly
-                variant="bordered"
-              />
-              <Input
-                label="芯片型号"
-                value={project.chipModel.toUpperCase()}
-                isReadOnly
-                variant="bordered"
-              />
-            </div>
+        {/* Gate Voltages */}
+        <div className="space-y-4">
+          <h4 className="text-base font-medium text-default-700 flex items-center gap-2">
+            <div className="w-2 h-2 rounded bg-purple-500"></div>
+            栅极电压 (Gate Voltages)
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="VGH (Gate High)"
+              type="number"
+              value={voltageSettings.vgh.toString()}
+              onChange={(e) => handleVoltageChange('vgh', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: 10V ~ 25V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
+            
+            <Input
+              label="VGL (Gate Low)"
+              type="number"
+              value={voltageSettings.vgl.toString()}
+              onChange={(e) => handleVoltageChange('vgl', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: -25V ~ -15V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
           </div>
+        </div>
 
-          <Divider />
-
-          {/* Voltage Settings */}
-          <div>
-            <h3 className="text-lg font-medium mb-4">驱动电压设置</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Input
-                label="VGH (Gate High)"
-                type="number"
-                value={voltageSettings.vgh.toString()}
-                onChange={(e) => handleVoltageChange('vgh', e.target.value)}
-                endContent="V"
-                description="范围: 10V ~ 25V"
-                variant="bordered"
-              />
-              
-              <Input
-                label="VGL (Gate Low)"
-                type="number"
-                value={voltageSettings.vgl.toString()}
-                onChange={(e) => handleVoltageChange('vgl', e.target.value)}
-                endContent="V"
-                description="范围: -25V ~ -15V"
-                variant="bordered"
-              />
-              
-              <Input
-                label="VSH (Source High)"
-                type="number"
-                value={voltageSettings.vsh.toString()}
-                onChange={(e) => handleVoltageChange('vsh', e.target.value)}
-                endContent="V"
-                description="范围: 10V ~ 20V"
-                variant="bordered"
-              />
-              
-              <Input
-                label="VSHR (Source High Ref)"
-                type="number"
-                value={voltageSettings.vshr.toString()}
-                onChange={(e) => handleVoltageChange('vshr', e.target.value)}
-                endContent="V"
-                description="范围: 0V ~ 10V"
-                variant="bordered"
-              />
-              
-              <Input
-                label="VSL (Source Low)"
-                type="number"
-                value={voltageSettings.vsl.toString()}
-                onChange={(e) => handleVoltageChange('vsl', e.target.value)}
-                endContent="V"
-                description="范围: -20V ~ -10V"
-                variant="bordered"
-              />
-              
-              <Input
-                label="VCOM"
-                type="number"
-                value={voltageSettings.vcom.toString()}
-                onChange={(e) => handleVoltageChange('vcom', e.target.value)}
-                endContent="V"
-                description="范围: -3V ~ 0V"
-                variant="bordered"
-              />
-            </div>
+        {/* Source Voltages */}
+        <div className="space-y-4">
+          <h4 className="text-base font-medium text-default-700 flex items-center gap-2">
+            <div className="w-2 h-2 rounded bg-blue-500"></div>
+            源极电压 (Source Voltages)
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Input
+              label="VSH (Source High)"
+              type="number"
+              value={voltageSettings.vsh.toString()}
+              onChange={(e) => handleVoltageChange('vsh', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: 10V ~ 20V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
+            
+            <Input
+              label="VSHR (Source High Ref)"
+              type="number"
+              value={voltageSettings.vshr.toString()}
+              onChange={(e) => handleVoltageChange('vshr', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: 0V ~ 10V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
+            
+            <Input
+              label="VSL (Source Low)"
+              type="number"
+              value={voltageSettings.vsl.toString()}
+              onChange={(e) => handleVoltageChange('vsl', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: -20V ~ -10V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
           </div>
+        </div>
 
-          <Divider />
-
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="bordered"
-              onClick={handleReset}
-            >
-              重置默认值
-            </Button>
-            <Button
-              color="primary"
-              onClick={handleSave}
-            >
-              保存设置
-            </Button>
+        {/* VCOM Voltage */}
+        <div className="space-y-4">
+          <h4 className="text-base font-medium text-default-700 flex items-center gap-2">
+            <div className="w-2 h-2 rounded bg-green-500"></div>
+            公共电压 (VCOM)
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="VCOM"
+              type="number"
+              value={voltageSettings.vcom.toString()}
+              onChange={(e) => handleVoltageChange('vcom', e.target.value)}
+              endContent={<span className="text-small text-default-400">V</span>}
+              description="范围: -3V ~ 0V"
+              variant="flat"
+              classNames={{
+                base: "transition-all duration-200",
+                inputWrapper: "hover:shadow-sm",
+                description: "text-xs",
+              }}
+            />
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4 pt-4">
+        <Button
+          variant="flat"
+          onClick={handleReset}
+          className="transition-all duration-200"
+        >
+          重置默认值
+        </Button>
+        <Button
+          color="primary"
+          onClick={handleSave}
+          className="transition-all duration-200"
+        >
+          保存设置
+        </Button>
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Card, CardBody, CardHeader } from '@heroui/card';
+import { Card, CardBody } from '@heroui/card';
 import { Button } from '@heroui/button';
 import { Input } from '@heroui/input';
 import { Tooltip } from '@heroui/tooltip';
@@ -209,79 +209,75 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
   const maxFrames = Math.max(...lutConfig.map(g => g.frames));
 
   return (
-    <div className="w-full space-y-4">
+    <div className="space-y-8">
       {/* 头部控制栏 */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center w-full">
-            <div>
-              <h2 className="text-xl font-semibold">SSD1677 LUT 波形编辑器</h2>
-              <p className="text-small text-default-500">
-                {project.name} - 10组波形配置
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="bordered"
-                size="sm"
-                onClick={() => {/* TODO: 导入C代码 */}}
-              >
-                导入C代码
-              </Button>
-              <Button
-                color="primary"
-                size="sm"
-                onClick={generateCCode}
-              >
-                生成C代码
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        
-        <CardBody>
-          {/* 统计信息 */}
-          <div className="grid grid-cols-5 gap-4 p-4 bg-default-50 rounded-lg mb-4">
-            <div className="text-center">
-              <div className="text-lg font-semibold">{lutConfig.reduce((sum, g) => sum + g.frames, 0)}</div>
-              <div className="text-xs text-default-500">总帧数</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">{totalTime.toFixed(1)}ms</div>
-              <div className="text-xs text-default-500">总时长</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">{lutConfig.filter(g => g.frames > 0).length}</div>
-              <div className="text-xs text-default-500">活跃组</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">{maxFrames}</div>
-              <div className="text-xs text-default-500">最大帧数</div>
-            </div>
-            <div className="text-center">
-              <div className="text-lg font-semibold">50Hz</div>
-              <div className="text-xs text-default-500">平均频率</div>
-            </div>
-          </div>
-        </CardBody>
-      </Card>
+      <div className="flex justify-between items-center">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">
+            SSD1677 LUT 波形编辑器
+          </h3>
+          <p className="text-small text-default-500 mt-1">
+            {project.name} - 10组波形配置
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Button
+            variant="flat"
+            size="sm"
+            onClick={() => {/* TODO: 导入C代码 */}}
+          >
+            导入C代码
+          </Button>
+          <Button
+            color="primary"
+            size="sm"
+            onClick={generateCCode}
+          >
+            生成C代码
+          </Button>
+        </div>
+      </div>
+
+      {/* 统计信息 */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-default-50 rounded-xl">
+        <div className="text-center group hover:scale-105 transition-transform duration-200">
+          <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{lutConfig.reduce((sum, g) => sum + g.frames, 0)}</div>
+          <div className="text-xs text-default-500 group-hover:text-blue-500 transition-colors">总帧数</div>
+        </div>
+        <div className="text-center group hover:scale-105 transition-transform duration-200">
+          <div className="text-xl font-bold text-purple-600 dark:text-purple-400">{totalTime.toFixed(1)}ms</div>
+          <div className="text-xs text-default-500 group-hover:text-purple-500 transition-colors">总时长</div>
+        </div>
+        <div className="text-center group hover:scale-105 transition-transform duration-200">
+          <div className="text-xl font-bold text-green-600 dark:text-green-400">{lutConfig.filter(g => g.frames > 0).length}</div>
+          <div className="text-xs text-default-500 group-hover:text-green-500 transition-colors">活跃组</div>
+        </div>
+        <div className="text-center group hover:scale-105 transition-transform duration-200">
+          <div className="text-xl font-bold text-orange-600 dark:text-orange-400">{maxFrames}</div>
+          <div className="text-xs text-default-500 group-hover:text-orange-500 transition-colors">最大帧数</div>
+        </div>
+        <div className="text-center group hover:scale-105 transition-transform duration-200">
+          <div className="text-xl font-bold text-red-600 dark:text-red-400">50Hz</div>
+          <div className="text-xs text-default-500 group-hover:text-red-500 transition-colors">平均频率</div>
+        </div>
+      </div>
 
       {/* 主要LUT表格 */}
-      <Card>
+      <Card className="border-0 shadow-lg">
         <CardBody className="p-0">
           <div className="overflow-x-auto">
             <div className="min-w-fit">
               {/* 组头部 */}
-              <div className="flex border-b-2 border-default-200 bg-default-100">
-                <div className="w-20 border-r border-default-200 p-2 text-center font-semibold">
+              <div className="flex border-b-2 border-gradient-to-r from-blue-200 to-purple-200 bg-gradient-to-r from-slate-50 to-blue-50 dark:from-slate-800 dark:to-blue-900/20">
+                <div className="w-24 border-r border-default-200 p-3 text-center font-bold text-default-700 bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-900">
                   Group
                 </div>
                 {lutConfig.map((group) => (
-                  <div key={group.id} className="border-r border-default-200">
+                  <div key={group.id} className="border-r border-default-200 bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-900">
                     <div className="flex">
                       {['S1.1', 'S1.2', 'S2.1', 'S2.2'].map((subPhase) => (
-                        <div key={subPhase} className="w-16 p-1 text-center border-r border-default-300 last:border-r-0">
-                          <div className="text-xs font-medium">{group.name}</div>
+                        <div key={subPhase} className={`w-20 p-2 text-center border-r border-default-300 last:border-r-0 transition-all duration-200 hover:bg-gradient-to-b hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/20 dark:hover:to-indigo-900/20`}>
+                          <div className="text-xs font-bold text-default-700">{group.name}</div>
                           <div className="text-xs text-default-500">{subPhase}</div>
                         </div>
                       ))}
@@ -291,16 +287,16 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
               </div>
 
               {/* G_RP行 */}
-              <div className="flex border-b border-default-200 bg-orange-50">
-                <div className="w-20 border-r border-default-200 p-2 text-center font-medium">
+              <div className="flex border-b border-default-200 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/10 dark:to-red-900/10">
+                <div className="w-24 border-r border-default-200 p-3 text-center font-bold text-orange-700 dark:text-orange-400">
                   G_RP
                 </div>
                 {lutConfig.map((group) => (
                   <div key={group.id} className="border-r border-default-200">
                     <div className="flex">
                       {['S1_1', 'S1_2', 'S2_1', 'S2_2'].map((subPhase) => (
-                        <div key={subPhase} className="w-16 p-1 text-center border-r border-default-300 last:border-r-0">
-                          <span className="text-sm">0</span>
+                        <div key={subPhase} className="w-20 p-2 text-center border-r border-default-300 last:border-r-0 hover:bg-orange-100 dark:hover:bg-orange-900/20 transition-colors duration-200">
+                          <span className="text-sm font-medium text-orange-600 dark:text-orange-400">0</span>
                         </div>
                       ))}
                     </div>
@@ -309,14 +305,14 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
               </div>
 
               {/* 帧数行 */}
-              <div className="flex border-b border-default-200 bg-blue-50">
-                <div className="w-20 border-r border-default-200 p-2 text-center font-medium">
+              <div className="flex border-b border-default-200 bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/10 dark:to-cyan-900/10">
+                <div className="w-24 border-r border-default-200 p-3 text-center font-bold text-blue-700 dark:text-blue-400">
                   Frames
                 </div>
                 {lutConfig.map((group) => (
                   <div key={group.id} className="border-r border-default-200">
                     <div className="flex">
-                      <div className="w-64 p-1 text-center">
+                      <div className="w-80 p-2 text-center">
                         <Input
                           size="sm"
                           type="number"
@@ -326,8 +322,8 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
                           max={255}
                           className="text-center"
                           classNames={{
-                            input: "text-center text-sm",
-                            inputWrapper: "h-7 min-h-7"
+                            input: "text-center text-sm font-medium",
+                            inputWrapper: "h-8 min-h-8 bg-white dark:bg-gray-800 border-1 border-blue-200 hover:border-blue-400 focus-within:border-blue-500 shadow-sm hover:shadow-md transition-all duration-200"
                           }}
                         />
                       </div>
@@ -338,36 +334,44 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
 
               {/* 波形数据行 */}
               {(['LUTW', 'LUTB', 'LUTW2', 'VCOM'] as WaveformType[]).map((waveform) => (
-                <div key={waveform} className="flex border-b border-default-200">
-                  <div className="w-20 border-r border-default-200 p-2 text-center font-medium bg-default-50">
+                <div key={waveform} className={`flex border-b border-default-200 ${
+                  waveform === 'LUTW' ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10' :
+                  waveform === 'LUTB' ? 'bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/10 dark:to-violet-900/10' :
+                  waveform === 'LUTW2' ? 'bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/10 dark:to-amber-900/10' :
+                  'bg-gradient-to-r from-pink-50 to-rose-50 dark:from-pink-900/10 dark:to-rose-900/10'
+                }`}>
+                  <div className="w-24 border-r border-default-200 p-3 text-center font-bold text-default-700 bg-gradient-to-b from-white/80 to-default-100/80 dark:from-gray-800 dark:to-gray-900">
                     {waveform}
                   </div>
                   {lutConfig.map((group) => (
                     <div key={group.id} className="border-r border-default-200">
                       <div className="flex">
                         {(['S1_1', 'S1_2', 'S2_1', 'S2_2'] as SubPhase[]).map((subPhase) => (
-                          <div key={subPhase} className="w-16 border-r border-default-300 last:border-r-0">
+                          <div key={subPhase} className="w-20 border-r border-default-300 last:border-r-0">
                             <div className="grid grid-cols-1 gap-0">
                               {group.waveforms[waveform][subPhase].slice(0, Math.min(group.frames, 12)).map((voltage, frameIndex) => (
                                 <Tooltip 
                                   key={frameIndex}
                                   content={`${waveform} ${subPhase} Frame ${frameIndex + 1}: Level ${voltage}`}
+                                  className="text-xs"
+                                  placement="top"
                                 >
                                   <button
-                                    className={`h-6 w-full border ${getVoltageColor(voltage)} hover:opacity-80 transition-opacity text-xs font-bold text-white`}
+                                    className={`h-8 w-full border-b border-white/20 ${getVoltageColor(voltage)} hover:scale-105 hover:shadow-lg transition-all duration-200 text-xs font-bold text-white relative group`}
                                     onClick={() => {
                                       const nextLevel = ((voltage + 1) % 4) as VoltageLevel;
                                       updateVoltage(group.id, waveform, subPhase, frameIndex, nextLevel);
                                     }}
                                   >
-                                    {getVoltageText(voltage)}
+                                    <span className="relative z-10">{getVoltageText(voltage)}</span>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                                   </button>
                                 </Tooltip>
                               ))}
                               {/* 如果帧数超过12，显示省略号 */}
                               {group.frames > 12 && (
-                                <div className="h-6 bg-default-100 flex items-center justify-center text-xs text-default-500">
-                                  ...
+                                <div className="h-8 bg-gradient-to-b from-default-100 to-default-200 flex items-center justify-center text-xs text-default-500 font-medium border-b border-white/20">
+                                  ⋯
                                 </div>
                               )}
                             </div>
@@ -380,14 +384,14 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
               ))}
 
               {/* 频率行 */}
-              <div className="flex bg-yellow-50">
-                <div className="w-20 border-r border-default-200 p-2 text-center font-medium">
+              <div className="flex bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/10 dark:to-orange-900/10">
+                <div className="w-24 border-r border-default-200 p-3 text-center font-bold text-yellow-700 dark:text-yellow-400">
                   FREQ
                 </div>
                 {lutConfig.map((group) => (
                   <div key={group.id} className="border-r border-default-200">
                     <div className="flex">
-                      <div className="w-64 p-1 text-center">
+                      <div className="w-80 p-2 text-center">
                         <Input
                           size="sm"
                           type="number"
@@ -396,10 +400,10 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
                           min={1}
                           max={1000}
                           className="text-center"
-                          endContent={<span className="text-xs text-default-500">Hz</span>}
+                          endContent={<span className="text-xs text-default-400">Hz</span>}
                           classNames={{
-                            input: "text-center text-sm",
-                            inputWrapper: "h-7 min-h-7"
+                            input: "text-center text-sm font-medium",
+                            inputWrapper: "h-8 min-h-8 bg-white dark:bg-gray-800 border-1 border-yellow-200 hover:border-yellow-400 focus-within:border-yellow-500 shadow-sm hover:shadow-md transition-all duration-200"
                           }}
                         />
                       </div>
@@ -413,42 +417,51 @@ export default function WaveformEditor({ project, onCodeGenerate }: WaveformEdit
       </Card>
 
       {/* 图例和说明 */}
-      <Card>
-        <CardBody>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 className="font-semibold mb-2">电压级别图例</h3>
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div>
-                  <span>Level 0</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-red-400 border border-red-500 rounded"></div>
-                  <span>Level 1</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-400 border border-blue-500 rounded"></div>
-                  <span>Level 2</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-green-400 border border-green-500 rounded"></div>
-                  <span>Level 3</span>
-                </div>
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+            电压级别图例
+          </h3>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors duration-200">
+              <div className="w-5 h-5 bg-gray-100 border border-gray-300 rounded"></div>
+              <span className="font-medium">Level 0</span>
             </div>
-            <div>
-              <h3 className="font-semibold mb-2">操作说明</h3>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• 点击电压单元格可循环切换0-3级别</li>
-                <li>• 调整帧数会自动调整波形数据长度</li>
-                <li>• G_RP行固定为0（SSD1677要求）</li>
-                <li>• FREQ设置每组的刷新频率</li>
-              </ul>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors duration-200">
+              <div className="w-5 h-5 bg-red-400 border border-red-500 rounded"></div>
+              <span className="font-medium">Level 1</span>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors duration-200">
+              <div className="w-5 h-5 bg-blue-400 border border-blue-500 rounded"></div>
+              <span className="font-medium">Level 2</span>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors duration-200">
+              <div className="w-5 h-5 bg-green-400 border border-green-500 rounded"></div>
+              <span className="font-medium">Level 3</span>
             </div>
           </div>
-        </CardBody>
-      </Card>
+        </div>
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg text-foreground flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+            操作说明
+          </h3>
+          <div className="space-y-3">
+            {[
+              "点击电压单元格可循环切换0-3级别",
+              "调整帧数会自动调整波形数据长度", 
+              "G_RP行固定为0（SSD1677要求）",
+              "FREQ设置每组的刷新频率"
+            ].map((tip, index) => (
+              <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-default-50 hover:bg-default-100 transition-colors duration-200">
+                <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
+                <span className="text-sm text-default-600">{tip}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
