@@ -78,4 +78,10 @@ export interface DriverICConfig {
   getVSHList: () => number[];
   getVSHRList: () => number[];
   getVSLList: () => number[];
+
+  defaultVGH: number;
+  defaultVGL?: number;
+  defaultVSH: number;
+  defaultVSHR: number;
+  defaultVSL: number;
 }

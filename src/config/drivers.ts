@@ -15,35 +15,39 @@ export const SSD1677_CONFIG: DriverICConfig = {
   getVGHList: () => {
     let vgh07_17 = [];
     for (let i = 0x07; i <= 0x17; i += 1) {
-      vgh07_17.push(12000 + i * 500);
+      vgh07_17.push(12000 + (i - 0x07) * 500);
     }
     return [20000, ...vgh07_17];
   },
   getVSHList: () => {
     let b7_0 = [];
     for (let i = 0x8E; i <= 0xCE; i += 1) {
-      b7_0.push(2400 + i * 100);
+      b7_0.push(2400 + (i - 0x8E) * 100);
     }
     let b7_1 = [];
     for (let i = 0x23; i <= 0x4B; i += 1) {
-      b7_1.push(9000 + i * 200);
+      b7_1.push(9000 + (i - 0x23) * 200);
     }
-    return [...b7_0, ...b7_1];
+    return [...b7_1, ...b7_0];
   },
   getVSLList: () => {
     let vsl = [];
     for (let i = 0x1A; i <= 0x3A; i += 1) {
-      vsl.push(900 + i * 500);
+      vsl.push(9000 + (i - 0x1A) * 500);
     }
     return vsl;
   },
   getVSHRList: () => {
     let vshr = [];
     for (let i = 0x8E; i <= 0xCE; i += 1) {
-      vshr.push(2400 + i * 100);
+      vshr.push(2400 + (i - 0x8E) * 100);
     }
     return vshr;
   },
+  defaultVGH: 20000,
+  defaultVSH: 15000,
+  defaultVSL: 15000,
+  defaultVSHR: 5000,
 };
 
 export const DRIVER_CONFIGS: Record<string, DriverICConfig> = {
