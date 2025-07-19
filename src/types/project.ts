@@ -7,61 +7,75 @@ export interface Project {
   config?: ProjectConfig;
 }
 
+export enum LUTType {
+  BW,
+  BWR,
+}
+
+export enum LUTPhaseType {
+  VSS,
+  VSH,
+  VSL,
+  VSHR,
+}
+
 export interface ProjectConfig {
   // SSD1677 specific configuration
   lutData?: LUTData;
-  temperature?: TemperatureConfig;
   voltageSettings?: VoltageSettings;
   // Add more configuration fields as needed
+  type: LUTType;
 }
 
 export interface VoltageSettings {
-  vgh: number;  // Gate High Voltage
-  vgl: number;  // Gate Low Voltage
-  vsh: number;  // Source High Voltage
-  vshr: number; // Source High Voltage Reference
-  vsl: number;  // Source Low Voltage
-  vcom: number; // VCOM Voltage
+  // 下面的值均为对应返回值的index
+  vgh: number;
+  vgl: number;
+  vsh: number;
+  vshr: number;
+  vsl: number;
+  vcom: number;
 }
 
 export interface LUTData {
+  groups: LUTGroup[];
+}
+
+export interface LUTGroup {
   phases: LUTPhase[];
-  repeatCount?: number;
-  frameRate?: number;
+  repeat: number;
+}
+
+export interface LUTStage {
+  repeat: number;
 }
 
 export interface LUTPhase {
-  id: string;
-  name: string;
-  duration: number; // in milliseconds
-  voltagePattern: VoltagePattern;
-}
-
-export interface VoltagePattern {
-  vsh: number;  // Source High Voltage
-  vsl: number;  // Source Low Voltage
-  vgh: number;  // Gate High Voltage
-  vgl: number;  // Gate Low Voltage
-}
-
-export interface TemperatureConfig {
-  ranges: TemperatureRange[];
-}
-
-export interface TemperatureRange {
-  min: number;
-  max: number;
-  lutAdjustment: number;
+  type: LUTPhaseType;
+  frameCount: number;
+  stages?: LUTStage[];
 }
 
 export interface DriverICConfig {
   id: string;
   name: string;
-  defaultConfig: any;
-  voltageRanges: {
-    vsh: { min: number; max: number; step: number };
-    vsl: { min: number; max: number; step: number };
-    vgh: { min: number; max: number; step: number };
-    vgl: { min: number; max: number; step: number };
+
+  group: {
+    phase: {
+      count: number; // 每个group里面的phase数量
+      hasTwoStages: boolean; // 是否有两阶段（俗称小循环）
+      stages?: {
+        repeatMax: number; // 每个阶段的最多重复次数
+      }
+      frameMax: number; // 每个phase的最多重复次数
+    }
+    count: number; // 每个IC里面最多包含的group数量
+    repeatMax: number; // 每个IC里面group最多重复次数
   };
+
+  getVGHList: () => number[];
+  getVGLList?: () => number[];
+  getVSHList: () => number[];
+  getVSHRList: () => number[];
+  getVSLList: () => number[];
 }
